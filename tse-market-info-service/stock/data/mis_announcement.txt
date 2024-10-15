@@ -1,0 +1,9 @@
+{
+    "rtcode": "0000",
+    "message": {
+        "cht": "本網站訂於臺灣時間 11 月 13 日（週日）08:00 至 18:00 進行系統測試，期間網站揭示資料非正式交易行情，不便之處請見諒。",
+        "eng": "Simulated data will be disclosed on Nov 13rd (SUN) between 08:00 and 18:00 UTC+8. We apologize for any inconvenience."
+    },
+    "startTime": "2022/11/11 15:00",
+    "endTime": "2022/11/13 17:30"
+}

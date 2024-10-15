@@ -1,0 +1,123 @@
+/*defaults*/
+*       {font-family: "Microsoft YaHei" ,"Microsoft JhengHei", "Heiti TC", "sans-serif"}
+body 	{text-align:center;background:#2765AF url('../images/body_bg.jpg') repeat-x 0 0; color:#000000; margin:0px 0; padding:0; font-family: Arial,Verdana; font-size:90%; }
+p		{margin:0; padding:0 0 15px 0; }
+a		{color:#0000FF; text-decoration:none; }
+a:hover	{color:#225799; text-decoration:none;}
+
+#scroll-to-top {display: none; position: fixed; right: 60px; bottom: 60px; width: 60px; height: 60px; border: 5px solid orange; margin: 30px; line-height: 60px; text-align: center; font-size: 50px; background: #808080; color: white; cursor: pointer; border-radius: 50%; box-shadow:4px 4px 12px 4px rgba(20%,20%,40%,0.5);}
+#sysDialog {display: none; background-color: #d20000; color: #fbfb00; font-weight: bolder; text-align: center; vertical-align: middle;}
+
+/*structural elements*/
+#container	{margin:0px auto; text-align:center; width:1260px; }
+#holder		{width:100%; padding:0px 0px 5px 0px; background:#FFFFFF; text-align:left; }
+
+#navigation	{padding:10px 0; }
+#header		{background:#DADADA url('../images/header_home.jpg') no-repeat 10px 10px; padding:0px; height:200px; }
+#content	{float:left; width:966px; padding:10px 10px 0 0; line-height:140%;margin-left:10px; margin-right:0px font-family:Microsoft JhengHei; font-size:100%;}
+#news		{float:right; width:250px; padding:0px 0; line-height:140%; text-align:justify; margin-right:20px}
+.newsItem	{padding:6px 6px 6px 6px; background:#FEFFD5; border:1px solid #FFEB70; font-size:90%; margin-bottom:5px; border-radius: 5px;}
+#footer		{clear:both; width:100%; background:#DADADA;width:1220px; padding:10px 20px; text-align:left; border-top:2px solid #2765AF;}
+#copyright	{float:right; }
+
+
+/*headings*/
+.newsItem h1	{color:#225799; margin:0 0 5px 0; padding:0; font-size:130%; font-weight:normal; }
+#content h1		{font-size:170%; font-weight:normal; line-height:130%; margin:0; padding:0 0 0px 0; }
+ h1		{font-size:190%; font-weight:normal; line-height:130%; margin:0; padding:0 0 0px 0; }
+#logo{
+float: left;
+width: 100%;
+height: 80px;
+color: #ffd700;
+background: url("../images/background.jpg") no-repeat left bottom;
+display:inline;
+text-decoration: none;
+white-space: nowrap;
+margin-left: 0px;
+}
+
+/*navigation*/
+#navigation ul 		{margin:0; padding:0; }
+#navigation li 		{margin:0; padding:0; list-style:none; display:inline; }
+#navigation a		{color:#225799; padding:0 20px 0 0; text-decoration:none; }
+#navigation a:hover	{color:#000000; }
+
+#footer ul 		{margin:0; padding:0; }
+#footer li 		{margin:0; padding:0; list-style:none; display:inline; }
+#footer a		{color:#000000; font-weight:bold; padding:0 5px 0 0; text-decoration:none; }
+#footer a:hover	{color:#000000; text-decoration:none; }
+
+
+/*shamelessly borrowed styles from http://www.positioniseverything.net/easyclearing.html*/
+.clearfix:after {content:"."; display:block; height:0; clear:both; visibility:hidden; }
+.clearfix {display:inline-block; }
+/* Hides from IE-mac \*/
+* html .clearfix {height:1%; }
+.clearfix {display:block; }
+/* End hide from IE-mac */
+
+#o00Table{font-size:90%;}
+#t00Table{font-size:90%;}
+
+/* ------------------------------------------------------ */
+article ul.doc-nav {
+    display: inline-block;
+    list-style: none;
+    font-size: 14px;
+    margin: 8px 0;
+    line-height: 1em;
+}
+
+article ul.doc-nav li {
+    float: left;
+    display: block;
+    padding: 4px 8px;
+    background-color: lightpink;
+    margin: 5px 5px;
+    border-radius: 5px;
+}
+
+article ul.doc-nav li>a {
+    text-decoration: none;
+    color: black;
+}
+
+article ul.doc-nav li:hover, article ul.doc-nav li.active {
+    background-color: deeppink;
+}
+
+article ul.doc-nav li:hover>a, article ul.doc-nav li.active>a {
+    color: white;
+}
+/* ------------------------------------------------------ */
+article ul.doc-nav2 {
+    display: inline-block;
+    list-style: none;
+    font-size: 14px;
+    margin: 8px 0;
+    line-height: 1em;
+}
+
+article ul.doc-nav2 li {
+    float: left;
+    display: block;
+    padding: 4px 8px;
+    background-color: #c6c6ff;
+    margin: 5px 5px;
+    border-radius: 5px;
+}
+
+article ul.doc-nav2 li>a {
+    text-decoration: none;
+    color: black;
+}
+
+article ul.doc-nav2 li:hover, article ul.doc-nav2 li.active {
+    background-color: #400080;
+}
+
+article ul.doc-nav2 li:hover>a, article ul.doc-nav2 li.active>a {
+    color: white;
+}
+/* ------------------------------------------------------ */

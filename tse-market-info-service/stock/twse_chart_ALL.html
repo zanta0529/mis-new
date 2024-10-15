@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>TWSE 基本市況報導網站-指數走勢圖檢視器</title>
+<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="js/highstock.js"></script>
+<script type="text/javascript">
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-138646291-1');
+
+    var closeTime = "";
+    var startTime = "";
+    //var hostname = window.location.hostname;
+    var apiBaseUrl = "/stock/api/";
+    var chart;
+    var upcolor = "#ff0000";
+    var downcolor = "#1f8f1f";
+    var exeYear = "";
+    var exeMonth = "";
+    var exeDay = "";
+    var refreshId = -1;
+    var refreshId_1st = -1;
+    var timezoneOffset = 0;
+    var hourOffset = 0;
+    var msecOffset = 0;
+    var unitStr=" (億)";
+    var idx = "t00.tw"; // 預設指數
+
+    Highcharts.setOptions({
+        global : {
+            useUTC : false
+        }
+    });
+
+    $(document).ready(function() {
+        listAllIndex();
+        $("#cmbSelectIndex").change(function() {
+            $("#readtimechart").html("<span style='color: red;'>無圖形</span>");
+            $("#requestUri").text("");
+            $("span[class=statistics]").text("");       
+            $("#txtRawdata").text("");
+
+            idx = $(this).val();
+            $("#nf").text($("#cmbSelectIndex").find("option:selected").text());            
+            getIndexInfo();
+        });
+
+        timezoneOffset = (new Date()).getTimezoneOffset() + 480;
+        hourOffset = (timezoneOffset) / 60;
+        msecOffset = hourOffset * 60 * 60 * 1000;
+
+        $.ajaxSetup({
+            cache : false
+        });
+
+        $("#readtimechart").width(425).height(180);
+        refreshId_1st = setInterval(getIndexInfo, 5000);        
+        getIndexInfo();
+    });
+
+    function getIndexInfo() {
+        var url = apiBaseUrl + "getChartOhlc.jsp?ex=tse&ch=" + idx + "&fqy=5&delay=0";
+        $.getJSON(url, function(data) {
+            if (data.rtcode == "0000") {
+                $("#txtRawdata").text(JSON.stringify(data));
+                if (typeof (data.infoArray) != 'undefined' && data.infoArray.length > 0) {
+                    exeYear = data.infoArray[0].d.substring(0, 4);
+                    exeMonth = data.infoArray[0].d.substring(4, 6) - 1;
+                    exeDay = data.infoArray[0].d.substring(6);
+                    initInfoArray(data.infoArray);
+                }
+
+                if (typeof (data.ohlcArray) != 'undefined') {
+                    loadOhlcArray(data.ohlcArray);
+                }
+
+                if (refreshId == -1) {
+                    clearInterval(refreshId_1st);
+                    refreshId = setInterval(getIndexInfo, 15000);
+                }
+
+                $("#nf").text($("#cmbSelectIndex").find("option:selected").text());
+                $("#requestUri").text(url);
+            }
+        });
+    }
+
+    function loadOhlcArray(ohlcArray) {
+        var ohlc = [], cPrice = [], valumeArr = [], dataLength = ohlcArray.length;
+        var maxValume = 0;
+
+        for (var i = 0; i < dataLength; i++) {
+            var currTime = parseInt(ohlcArray[i].t * 100000) + msecOffset;
+            if (i == 0) {
+                var dtB = new Date(exeYear, exeMonth, exeDay, 9, 0, 0);
+                cPrice.push([ dtB.getTime(), yesPrice * 1 ]);
+                valumeArr.push([ dtB.getTime(), 0 ]);
+            }
+
+            if (closeTime == "" && i == dataLength - 1) {
+                var dt = new Date();
+                dt.setTime(currTime);
+                var dtB = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 13, 35, 0);
+                closeTime = dtB.getTime();
+            }
+
+            if (ohlcArray[i].s >= 0) {
+                cPrice.push([ currTime, ohlcArray[i].c * 1 ]);
+                valumeArr.push([ currTime, ohlcArray[i].s * 1 ]);
+
+                if (ohlcArray[i].s > maxValume) {
+                    maxValume = ohlcArray[i].s * 1;
+                }
+            }
+        }
+
+        var dtB = new Date(exeYear, exeMonth, exeDay, 13, 32, 0);
+        closeTime = dtB.getTime();
+
+        var dtA = new Date(exeYear, exeMonth, exeDay, 08, 59, 0);
+        startTime = dtA.getTime();
+        loadOhcl(cPrice, upper, lower, maxValume, yesPrice, valumeArr);
+    }
+
+    function initInfoArray(infoArr) {        
+        $.each(infoArr, function(i, item) {
+            var cStr = item.c;
+
+            $("#t").text(item.t);
+
+            if (item.t.indexOf("13:33") >= 0 || item.t.indexOf("13:31") >= 0) {
+                var dateStr = item.d;
+                dateStr = dateStr.substring(0, 4) + "/" + dateStr.substring(4, 6) + "/" + dateStr.substring(6);
+                $("#t").text(dateStr);
+            }
+
+            if (item.t.indexOf("07:50:00") >= 0 || item.t.indexOf("07:59:00") >= 0) {
+                $("#t").text("00:00:00");
+            }
+
+            if (item.t.indexOf("07:") == 0) {
+                $("#t").text("00:00:00");
+            }
+
+            if (item.y != "-" && item.z != "-") {
+                upper = (item.u);
+                lower = (item.w);
+                if (upper == undefined) {
+                    upper = item.h;
+                }
+
+                if (lower == undefined) {
+                    lower = item.l;
+                }
+
+                yesPrice = (item.y);
+
+                var diffStr = (item.z - item.y).toFixed(2);
+                var preStr = (diffStr / item.y * 100).toFixed(2);
+
+                $("#h").text(item.h);
+                $("#l").text(item.l);
+
+                if (item.v > 0) {
+                    var strTv = (item.v / 100);
+                    strTv = strTv + "";
+                    var diffCount = (strTv.length - strTv.indexOf("."));
+                    if (diffCount == 2) {
+                        strTv += "0";
+                    } else if (diffCount == strTv.length + 1) {
+                        strTv += ".00";
+                    }
+                    strTv += unitStr;
+                    $("#tv").html(strTv);
+                } else {
+                    $("#tv").html(" ");
+                }
+
+                if (item.z * 1 < item.y * 1) {
+                    $("#d").css("color", downcolor);
+                    $("#p").css("color", downcolor);
+                    $("#i").text(item.z);
+                    diffStr = diffStr * -1;
+                    preStr = preStr * -1;
+                    $("#d").text("-" + diffStr);
+                    $("#p").text("-" + preStr + "%");
+                } else if (item.z * 1 > item.y * 1) {
+                    $("#d").css("color", upcolor);
+                    $("#p").css("color", upcolor);
+                    $("#i").text(item.z);
+                    $("#d").text("+" + diffStr);
+                    $("#p").text("+" + preStr + "%");
+                } else if (item.z == item.y) {
+                    $("#d").css("color", "#0000ff");
+                    $("#p").css("color", "#0000ff");
+                    $("#i").text(item.z);
+                }
+            }
+
+            if (typeof (item.z) == "undefined") {
+                $("#h").text("0.0");
+                $("#l").text("0.0");
+                $("#i").text(item.y);
+                $("#d").text("0.0");
+                $("#p").text("0.0%");
+            }
+        });
+    }
+
+    function loadOhcl(cPrice, upper, lower, maxValume, yesPrice, valumeArr) {
+        // console.log("cPrice="+cPrice+", upper="+upper+", lower="+lower+", maxValume="+maxValume+", yesPrice="+yesPrice+", valumeArr="+valumeArr);
+        var gap = parseInt(yesPrice * 0.015);
+        var upGap = (upper - yesPrice) * 1.2;
+        var lowGap = (yesPrice - lower) * 1.2;
+        upper = Math.round(yesPrice * 1.015);
+        lower = Math.round(yesPrice * 0.985);
+        var tkInt = ((upper - lower) / 4);
+
+        if (maxValume == 0) {
+            maxValume = 4000;
+        }
+        
+        // console.log("[yesPrice="+yesPrice+"], [gap="+gap+"], [upGap="+upGap+"],[lowGap="+lowGap+"],[upper="+upper+"],[lower="+lower+"]");
+        if (upGap > gap || lowGap > gap) {
+            gap = lowGap;
+            if (upGap > lowGap) {
+                gap = upGap;
+            }
+
+            upper = Math.round(parseFloat(yesPrice) + parseFloat(gap));
+            lower = parseInt(yesPrice - gap);
+            tkInt = ((upper - lower) / 4);
+
+            if (chart != undefined) {
+                chart = undefined;
+            }
+        }
+
+        if (chart != undefined && maxValume > chart.yAxis[0].max) {
+            chart.yAxis[0].max = maxValume;
+            if (chart != undefined) {
+                chart = undefined;
+            }
+        }
+
+        //if (chart == undefined) {
+            chart = new Highcharts.StockChart({
+                chart: {
+                    style: {
+                        fontFamily: 'Verdana'
+                    },
+                    marginRight: 20,
+                    animation: false,
+                    renderTo: 'readtimechart',
+                    alignTicks: true,
+                    margin: 0,
+                    marginTop: 10,
+                    marginLeft: 35,
+                    marginRight: 25,
+                    marginBottom: 24,
+                    plotBorderColor: '#606060',
+                    plotBorderWidth: 1
+                },
+                scrollbar: {
+                    enabled: false
+                },
+                credits: {
+                    text: ""
+                },
+                navigator: {
+                    enabled: false
+                },
+                tooltip: {
+                    enabled: false
+                },
+                rangeSelector: {
+                    enabled: false
+                },
+                plotOptions: {
+                    area: {
+                        fillColor: {
+                            linearGradient: [0, 200, 400],
+                            stops: [
+                                [0, Highcharts.getOptions().colors[0]],
+                                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                            ]
+                        },
+                        animation: false,
+                        color: "#4b32f9",
+                        fillOpacity: 0.6,
+                        lineWidth: 1,
+                        states: {
+                            hover: {
+                                enabled: false
+                            }
+                        }
+                    },
+                    column: {
+                        animation: false,
+                        color: 'red',
+                        grouping: false
+                    },
+                    line: {
+                        animation: false,
+                        grouping: false,
+                        color: "#ff0000",
+                        lineWidth: 1,
+                        states: {
+                            hover: {
+                                enabled: false
+                            }
+                        }
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickInterval: 60 * 60 * 1000,
+                    minTickInterval: 60 * 60 * 1000,
+                    dateTimeLabelFormats: {
+                        hour: '%H'
+                    },
+                    min: startTime,
+                    max: closeTime,
+                    minorTickInterval: 60 * 60 * 1000,
+                    labels: {
+                        align: "right",
+                        style: {
+                            fontFamily: 'Tahoma, Verdana, Arial, Helvetica, sans-serif',
+                            fontSize: '11px',
+                            color: "#000000"
+                        },
+                        x: 5
+                    }
+                },
+                yAxis: [{
+                        lineWidth: 1,
+                        min: 0,
+                        offset: 0,
+                        startOnTick: true,
+                        //endOnTick: true,
+                        labels: {
+                            style: {
+                                fontFamily: 'Tahoma, Verdana, Arial, Helvetica, sans-serif',
+                                fontSize: '11px',
+                                color: "#000000"
+                            },
+                            formatter: function() {
+                                return parseInt(this.value / 100) + "";
+                            },
+                            x: 367,
+                            y: 5,
+                            align: 'left'
+                        },
+                        max: maxValume,
+                        showLastLabel: true,
+                        tickInterval: maxValume / 4,
+                    },
+                    {
+                        title: {
+                            rotation: 0,
+                            align: 'high',
+                            text: ""
+                        },
+                        plotLines: [{
+                            value: yesPrice,
+                            color: 'blue',
+                            dashStyle: 'shortdash',
+                            width: 1,
+                            zIndex: 3
+                        }],
+                        lineWidth: 1,
+                        minPadding: 0,
+                        min: lower,
+                        max: upper,
+                        startOnTick: false,
+                        //endOnTick: false,
+                        tickInterval: tkInt,
+                        labels: {
+                            style: {
+                                fontFamily: 'Tahoma, Verdana, Arial, Helvetica, sans-serif',
+                                fontSize: '11px',
+                                color: "#000000"
+                            },
+                            align: 'right',
+                            x: -2,
+                            y: 5,
+                            formatter: function() {
+                                //alert("value="+this.value);
+                                return this.value;
+                            }
+                        },
+                        showLastLabel: true,
+                        tickPositions: [lower, Math.round(lower + tkInt * 1), Math.round(yesPrice),
+                            Math.round(lower + tkInt * 3), upper
+                        ]
+                    }
+                ],
+                series: [{
+                    type: 'area',
+                    fillOpacity: 0.01,
+                    data: valumeArr,
+                    dataGrouping: {
+                        enabled: false
+                    }
+                }, {
+                    type: 'line',
+                    name: "成交價",
+                    data: cPrice,
+                    yAxis: 1,
+                    dataGrouping: {
+                        enabled: false
+                    }
+                }]
+            });
+            chart.redraw(true);
+        //} else {
+        //    chart.series[0].setData(valumeArr, false);
+        //    chart.series[1].setData(cPrice, false);
+        //    chart.redraw();
+        //}
+    }
+    
+    function listAllIndex() {
+        var url = apiBaseUrl + "getCategory.jsp?ex=tse&i=TIDX";
+        $("#idxListUri").text(url);
+        $.getJSON(url, function(data) {
+            if (data.rtcode == "0000") {                
+                if (typeof(data.msgArray) != 'undefined' && data.msgArray.length > 0) {
+                    $.each(data.msgArray, function(i, obj) {
+                        var idxName = (typeof(obj.nf) == "undefined") ? obj.n : obj.nf;
+                        $("#cmbSelectIndex").append("<option value='" + obj.ch + "'>" + idxName + " (" + obj.ch + ")</option>");
+                    });
+                    
+                    // 手動新增不在網頁上顯示的指數
+                    $("#cmbSelectIndex").append("<option value=''>=== 以下為網頁不顯示的指數 ===</option>");
+                    $("#cmbSelectIndex").append("<option value='IX0126.tw'>臺股期貨指數 (IX0126)</option>");
+                }
+            } else {                
+            }
+        });
+    }
+</script>
+<style type="text/css">
+    * {
+        font-family: "Tahoma";
+        font-size: 14px;
+    }
+    
+    #nf {
+        color: blue;
+    }
+    
+    #idxListUri, #requestUri {
+        padding-top: 10px;
+        color: #666666;
+    }
+    
+    #divAction1, #divAction2, #txtRawdata {
+        text-align: left;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        font-family: "Consolas", "Courier New";
+    }
+</style>
+</head>
+
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+    <center>
+        <div id="barSelectIndex">
+            <label>請選擇指數：</label>
+            <select id="cmbSelectIndex"></select>
+        </div>
+
+        <div id="readtimechart"></div>
+        <div id="divStatistics">
+            <span id="t" class="statistics"></span>&nbsp;&nbsp;
+            <span id="nf" class="statistics"></span>&nbsp;&nbsp;            
+            <span id="i" class="statistics"></span>&nbsp;&nbsp;
+            <span id="d" class="statistics"></span>&nbsp;&nbsp;
+            <span id="p" class="statistics"></span>&nbsp;&nbsp;
+            <span id="tv" class="statistics">成交金額：</span>&nbsp;&nbsp;
+        </div>
+        <div id="divAction1">
+            <span>指數清單：</span>
+            <span id="idxListUri"></span>
+        </div>
+        <div id="divAction2">
+            <span>查詢參數：</span>
+            <span id="requestUri"></span>
+        </div>
+        <textarea id="txtRawdata" style="width: 90%; height: 500px;"></textarea>
+    </center>
+</body>
+</html>

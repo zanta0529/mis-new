@@ -1,0 +1,22 @@
+
+.ticker {
+	width: 250px;
+	height: 190px;
+	overflow: hidden;
+	border:1px solid #FFEB70;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border-radius: 5px;
+	box-shadow: 0px 0px 5px #DDD;
+	background:#FEFFD5;
+	margin-bottom:20px;
+}
+
+
+.ticker li {
+	height: 190px;
+	border-bottom: 1px dotted #DDD;
+	padding: 5px;
+	margin: 0px 5px;
+}

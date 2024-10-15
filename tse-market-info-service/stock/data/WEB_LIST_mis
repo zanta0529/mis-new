@@ -1,0 +1,2 @@
+futures_side.txt 5 https://mis.taifex.com.tw/futures/api/v1/getFuturesReg?commodity=TX --insecure
+futures_chart.txt 5 https://mis.taifex.com.tw/futures/api/v1/getFuturesMinuteTickReg?commodity=TX --insecure

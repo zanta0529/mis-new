@@ -1,0 +1,32 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+body {
+  font-family: "Noto Sans TC", "Noto Sans", "PingFangTC", "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  line-height: 1.5;
+}
+button {
+  /* 重設所有樣式 */
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 100%; /* 保持字體大小正常 */
+  font: inherit; /* 保持字體風格正常 */
+  color: inherit; /* 保持文字顏色正常 */
+  background-color: transparent; /* 背景色為透明 */
+  cursor: pointer; /* 讓游標顯示為手指形狀 */
+
+  /* 可以根據需要添加其他樣式重設 */
+}

@@ -1,0 +1,118 @@
+export function useEntrustStatisData(obj) {
+  const entrustList = ref([]);
+  entrustList.value.push(
+    // tz:整體市場 fz:上市股票 nz:上市創新版股票 sz:基金 cz:認購權證	bz:認售權證
+    {
+      n: 'MARKET_SUMMARY_OVERALL_BID_VOLUME',
+      tz: obj.t4,
+      fz: obj.s4,
+      nz: obj.n4,
+      sz: obj.f4,
+      cz: obj.c4,
+      bz: obj.b4,
+    },
+    {
+      n: 'MARKET_SUMMARY_OVERALL_BID_ORDERS',
+      tz: obj.t2,
+      fz: obj.s2,
+      nz: obj.n2,
+      sz: obj.f2,
+      cz: obj.c2,
+      bz: obj.b2,
+    },
+    {
+      n: 'MARKET_SUMMARY_OVERALL_ASK_VOLUME',
+      tz: obj.t3,
+      fz: obj.s3,
+      nz: obj.n3,
+      sz: obj.f3,
+      cz: obj.c3,
+      bz: obj.b3,
+    },
+    {
+      n: 'MARKET_SUMMARY_OVERALL_ASK_ORDERS',
+      tz: obj.t1,
+      fz: obj.s1,
+      nz: obj.n1,
+      sz: obj.f1,
+      cz: obj.c1,
+      bz: obj.b1,
+    },
+    {
+      n: 'MARKET_SUMMARY_BID_VOLUME_AT_LIMIE_UP',
+      tz: obj.tu4,
+      fz: obj.su4,
+      nz: obj.nu4,
+      sz: obj.fu4,
+      cz: obj.cu4,
+      bz: obj.bu4,
+    },
+    {
+      n: 'MARKET_SUMMARY_BID_ORDERS_AT_LIMIE_UP',
+      tz: obj.tu2,
+      fz: obj.su2,
+      nz: obj.nu2,
+      sz: obj.fu2,
+      cz: obj.cu2,
+      bz: obj.bu2,
+    },
+    {
+      n: 'MARKET_SUMMARY_ASK_VOLUME_AT_LIMIE_UP',
+      tz: obj.tu3,
+      fz: obj.su3,
+      nz: obj.nu3,
+      sz: obj.fu3,
+      cz: obj.cu3,
+      bz: obj.bu3,
+    },
+    {
+      n: 'MARKET_SUMMARY_ASK_ORDERS_AT_LIMIE_UP',
+      tz: obj.tu1,
+      fz: obj.su1,
+      nz: obj.nu1,
+      sz: obj.fu1,
+      cz: obj.cu1,
+      bz: obj.bu1,
+    },
+    {
+      n: 'MARKET_SUMMARY_BID_VOLUME_AT_LIMIE_DOWN',
+      tz: obj.tw4,
+      fz: obj.sw4,
+      nz: obj.nw4,
+      sz: obj.fw4,
+      cz: obj.cw4,
+      bz: obj.bw4,
+    },
+    {
+      n: 'MARKET_SUMMARY_BID_ORDERS_AT_LIMIE_DOWN',
+      tz: obj.tw2,
+      fz: obj.sw2,
+      nz: obj.nw2,
+      sz: obj.fw2,
+      cz: obj.cw2,
+      bz: obj.bw2,
+    },
+    {
+      n: 'MARKET_SUMMARY_ASK_VOLUME_AT_LIMIE_DOWN',
+      tz: obj.tw3,
+      fz: obj.sw3,
+      nz: obj.nw3,
+      sz: obj.fw3,
+      cz: obj.cw3,
+      bz: obj.bw3,
+    },
+    {
+      n: 'MARKET_SUMMARY_ASK_ORDERS_AT_LIMIE_DOWN',
+      tz: obj.tw1,
+      fz: obj.sw1,
+      nz: obj.nw1,
+      sz: obj.fw1,
+      cz: obj.cw1,
+      bz: obj.bw1,
+    }
+  );
+
+  return {
+    entrustList,
+  };
+}

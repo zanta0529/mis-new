@@ -1,0 +1,66 @@
+t00,發行量加權股價指數,TAIEX
+t16,觀光餐旅類指數,Tourism and Hospitality
+BC30,藍籌30指數,BC 30 Index
+BC30-1,藍籌30反向一倍指數,BC30 Inverse -1X Index
+CG100,臺灣公司治理100指數,TWSE CG 100 Index
+DVA100,漲升股利100指數,TIP DVA 100 Index
+DVA150,漲升股利150指數,TIP DVA 150 Index
+EDRIN,電子類反向指數,Electronics Inverse -1X Index
+EDRL2,電子類兩倍槓桿指數,Electronics Leveraged 2X Index
+EMP99,臺灣就業99指數,Taiwan RAFIR EMP 99 Index
+F4GTTE,臺灣永續指數,F4G TIP TW ESG Index
+FDRIN,金融類日報酬反向一倍指數,Finance Inverse -1X Index
+FDRL2,金融類日報酬兩倍指數,Finance Leveraged 2X Index
+FRMSA,寶島股價指數,FRMSA Index
+HC100,臺灣高薪100指數,Taiwan HC 100 Index
+INE30,工業菁英30指數,TIP INE 30 Index
+IR0038,觀光餐旅類報酬指數,Tourism and Hospitality TRI
+IR0091,漲升股利150報酬指數,TIP DVA 150 Total Return Index
+IR0095,電子菁英30報酬指數,TIP ITE 30 Total Return Index
+IR0112,存股雙十等權重報酬指數,TIP H20 EW Total Return Index
+IR0113,特選大蘋果報酬指數,TIP APL Total Return Index
+IR0114,中小型300報酬指數,TIP TWSM 300 Total Return Index
+IR0115,特股高息20報酬指數,TIP PSHD 20 Total Return Index
+IR0116,臺灣500報酬指數,TIP Cap Top 500 Total Return Index
+IR0117,特選外資豐擁50報酬指數,TIP FS 50 Total Return Index
+IR0120,微波高息精選20報酬指數,TIP ELVD 20 Total Return Index
+IR0122,特選世代行動通訊報酬指數,TIP NGMC Total Return Index
+IR0124,智慧投資多因子30報酬指數,TIP Smart 30 Total Return Index
+IR0127,特選大蘋果報酬正向兩倍指數,TIP APL TR Daily Return Leveraged 2X Index
+IR0128,特選大蘋果報酬反向一倍指數,TIP APL TR Daily Return Inverse -1X Index
+IR0129,加權指數掩護性臺指買權價外5%報酬指數,TIP TAIFEX TAIEX Covered Call OTM5% TR Index
+IR0185,綠能環保類報酬指數,Green Energy and Environmental Services TRI
+IR0186,數位雲端類報酬指數,Digital and Cloud Services TRI
+IR0187,運動休閒類報酬指數,Sports and Leisure TRI
+IR0188,居家生活類報酬指數,Household TRI
+ITE30,電子菁英30指數,TIP ITE 30 Index
+IX0038,觀光餐旅類指數,Tourism and Hospitality
+IX0103,臺灣生技指數,TIP Taiwan BIO Index
+IX0104,特選高息低波指數,TIP HDMV Index
+IX0106,工業菁英30反向一倍指數,TIP INE30 Inverse -1X Index
+IX0107,特選內需高收益指數,TIP DDHY Index
+IX0108,臺灣中小型公司治理指數,TIP Taiwan SMCG Index
+IX0109,臺灣IPO指數,TIP Taiwan IPO Index
+IX0110,價值投資指數,TIP VI 30 Index
+IX0114,中小型300指數,TIP TWSM 300 Index
+IX0119,臺灣勞工權益指數,Taiwan LR Index
+IX0124,智慧投資多因子30指數,TIP Smart 30 Index
+IX0125,智慧中立指數,TIP TAIFEX Smart Market Neutral Index
+IX0126,臺股期貨指數,TIP TAIFEX TX Futures Index
+IX0185,綠能環保類指數,Green Energy and Environmental Services
+IX0186,數位雲端類指數,Digital and Cloud Services
+IX0187,運動休閒類指數,Sports and Leisure
+IX0188,居家生活類指數,Household
+LB100,低貝塔100指數,TIP LB 100 Index
+LV30,低波動股利精選30指數,TIP LV 30 Index
+SAM50,中小型A級動能50指數,TIP SAM 50 Index
+SC300,小型股300指數,TWSE SC 300 Index
+SMC50,中小型精選50指數,TIP SMC 50 Index
+TTDRIN,臺指反向一倍指數,TAIEX Inversed -1X Index
+TTDRL2,臺指日報酬兩倍指數,TAIEX Leveraged 2X Index
+TW50,臺灣50指數,FTSE TWSE Taiwan 50 Index
+TW50C,臺灣50權重上限30%指數,FTSE TWSE Taiwan 50 30% Capped Index
+TWDP,臺灣高股息指數,FTSE TWSE Taiwan Dividend+ Index
+TWEI,臺灣發達指數,FTSE TWSE Taiwan Eight Industries Index
+TWIT,臺灣資訊科技指數,FTSE TWSE Taiwan Technology Index
+TWMC,臺灣中型100指數,FTSE TWSE Taiwan Mid-Cap 100 Index

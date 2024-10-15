@@ -1,0 +1,469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="js/highstock.js"></script>
+<script type="text/javascript">
+    var closeTime = "";
+    var startTime = "";
+    var chart;
+    var upcolor = "#ff0000";
+    var downcolor = "#1f8f1f";
+    var exeYear = "";
+    var exeMonth = "";
+    var exeDay = "";
+    var note = "成交金額不含零股、鉅額、盤後定價、拍賣及標購。";
+    var refreshId = -1;
+    var refreshId_1st = -1;
+    var timezoneOffset = 0;
+    var hourOffset = 0;
+    var msecOffset = 0;
+
+    Highcharts.setOptions({
+        global : {
+            useUTC : false
+        }
+    });
+
+    var urlStr = window.location.toString();
+    var unitStr = " (億)";
+    var dataUrl = "/stock/data";
+
+    $(document).ready(function() {
+        timezoneOffset = (new Date()).getTimezoneOffset() + 480;
+
+        hourOffset = (timezoneOffset) / 60;
+        msecOffset = hourOffset * 60 * 60 * 1000;
+
+        $.ajaxSetup({
+            cache : false
+        });
+        if (urlStr.indexOf("lang=us_en") > 0 || urlStr.indexOf("lang=en_us") > 0) {
+            upcolor = "#1f8f1f";
+            downcolor = "#ff0000";
+            $("#TWSE_TXT1").text("TAIEX:");
+            $("#TWSE_TXT2").text("");
+            $("#HIGH_TXT1").text("Highest:");
+            $("#LOW_TXT1").text("Lowest:");
+            $("#VALUE_TXT").text("Value");
+            unitStr = " (100 million NTD)";
+            note = "Odd-lot, Block, Off-hour, Auction and Tender Offer trading are not included in Trade Volume.";
+        } else if (urlStr.indexOf("lang=jp") > 0) {
+            $("#TWSE_TXT1").text("加権指数:");
+            $("#TWSE_TXT2").text("");
+            $("#HIGH_TXT1").text("Highest:");
+            $("#LOW_TXT1").text("Lowest:");
+            $("#VALUE_TXT").text("売買代金");
+            unitStr = " (億台湾ドル)";
+            note = "売買代金には端株、時間外終値、ブロック、競売買および買い入札の各取引を含みません。";
+        }
+
+        $("#readtimechart").width(425).height(140);
+        $("#note").text(note);
+
+        refreshId_1st = setInterval(function() {
+            loadStockInfo1();
+        }, 5000);
+        loadStockInfo1();
+    });
+
+    function loadStockInfo1() {
+        //$.getJSON(apiBaseUrl+"getChartOhlc.jsp?ex=tse&ch=t00.tw&fqy=5&delay=0",function(data)
+        $.getJSON(dataUrl + "/mis_ohlc_WWW.txt", function(data) {
+            if (data.rtcode == "0000") {
+                if (typeof (data.infoArray) != 'undefined' && data.infoArray.length > 0) {
+                    exeYear = data.infoArray[0].d.substring(0, 4);
+                    exeMonth = data.infoArray[0].d.substring(4, 6) - 1;
+                    exeDay = data.infoArray[0].d.substring(6);
+                    initInfoArray(data.infoArray);
+                }
+
+                if (typeof (data.ohlcArray) != 'undefined') {
+                    loadOhlcArray(data.ohlcArray);
+                }
+
+                if (refreshId == -1) {
+                    clearInterval(refreshId_1st);
+                    refreshId = setInterval(function() {
+                        loadStockInfo1();
+                    }, 15000);
+                }
+            }
+        });
+    }
+
+    function loadOhlcArray(ohlcArray) {
+        var ohlc = [], cPrice = [], valumeArr = [], dataLength = ohlcArray.length;
+        var maxValume = 0;
+
+        var i = 0;
+        for (i = 0; i < dataLength; i++) {
+            var currTime = parseInt(ohlcArray[i].t * 100000) + msecOffset;
+            if (i == 0) {
+                var dtB = new Date(exeYear, exeMonth, exeDay, 9, 0, 0);
+                cPrice.push([ dtB.getTime(), yesPrice * 1 ]);
+                valumeArr.push([ dtB.getTime(), 0 ]);
+            }
+
+            if (closeTime == "" && i == dataLength - 1) {
+                var dt = new Date();
+                dt.setTime(currTime);
+                var dtB = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 13, 35, 0);
+                closeTime = dtB.getTime();
+            }
+
+            if (ohlcArray[i].s >= 0) {
+                cPrice.push([ currTime, ohlcArray[i].c * 1 ]);
+                valumeArr.push([ currTime, ohlcArray[i].s * 1 ]);
+
+                if (ohlcArray[i].s > maxValume) {
+                    maxValume = ohlcArray[i].s * 1;
+                }
+            }
+        }
+
+        var dtB = new Date(exeYear, exeMonth, exeDay, 13, 32, 0);
+        closeTime = dtB.getTime();
+
+        var dtA = new Date(exeYear, exeMonth, exeDay, 08, 59, 0);
+        startTime = dtA.getTime();
+        loadOhcl(cPrice, upper, lower, maxValume, yesPrice, valumeArr);
+    }
+
+    function initInfoArray(infoArr) {
+        //alert("initInfoArray");
+        $.each(infoArr, function(i, item) {
+            var cStr = item.c;
+
+            $("#t").text(item.t);
+
+            if (item.t.indexOf("13:33") >= 0 || item.t.indexOf("13:31") >= 0) {
+                var dateStr = item.d;
+                dateStr = dateStr.substring(0, 4) + "/" + dateStr.substring(4, 6) + "/" + dateStr.substring(6);
+                $("#t").text(dateStr);
+            }
+            //alert(item.t.indexOf("07:50:00"));
+            if (item.t.indexOf("07:50:00") >= 0 || item.t.indexOf("07:59:00") >= 0) {
+                $("#t").text("00:00:00");
+            }
+
+            if (item.t.indexOf("07:") == 0) {
+                $("#t").text("00:00:00");
+            }
+
+            if (item.y != "-" && item.z != "-") {
+                upper = (item.u);
+                lower = (item.w);
+                if (upper == undefined) {
+                    upper = item.h;
+                }
+
+                if (lower == undefined) {
+                    lower = item.l;
+                }
+
+                yesPrice = (item.y);
+                //loadChart("tse_t00.tw",d0,upper,lower, yesPrice);
+
+                var diffStr = (item.z - item.y).toFixed(2);
+                var preStr = (diffStr / item.y * 100).toFixed(2);
+
+                $("#h").text(item.h);
+                $("#l").text(item.l);
+                if (item.v > 0) {
+                    var strTv = (item.v / 100);
+                    strTv = strTv + "";
+                    var diffCount = (strTv.length - strTv.indexOf("."));
+                    if (diffCount == 2) {
+                        strTv += "0";
+                    } else if (diffCount == strTv.length + 1) {
+                        strTv += ".00";
+                    }
+
+                    strTv += unitStr;
+                    $("#tv").html(strTv);
+                } else {
+                    $("#tv").html(0.00);
+                }
+                if (item.z * 1 < item.y * 1) {
+                    $("#d").css("color", downcolor);
+                    $("#p").css("color", downcolor);
+                    $("#i").text(item.z);
+                    diffStr = (diffStr * -1).toFixed(2);
+                    preStr = (preStr * -1).toFixed(2);
+                    $("#d").text("-" + diffStr);
+                    $("#p").text("-" + preStr + "%");
+                } else if (item.z * 1 > item.y * 1) {
+                    $("#d").css("color", upcolor);
+                    $("#p").css("color", upcolor);
+                    $("#i").text(item.z);
+                    $("#d").text("+" + diffStr);
+                    $("#p").text("+" + preStr + "%");
+                } else if (item.z == item.y) {
+                    $("#d").css("color", "#0000ff");
+                    $("#p").css("color", "#0000ff");
+                    $("#i").text(item.z);
+                }
+            }
+            if (typeof (item.z) == "undefined") {
+                $("#h").text("0.0");
+                $("#l").text("0.0");
+                $("#i").text(item.y);
+                $("#d").text("0.0");
+                $("#p").text("0.0%");
+            }
+        });
+    }
+
+    function loadOhcl(cPrice, upper, lower, maxValume, yesPrice, valumeArr) {
+        var gap = parseInt(yesPrice * 0.015);
+        var upGap = (upper - yesPrice) * 1.2;
+        var lowGap = (yesPrice - lower) * 1.2;
+        upper = Math.round(yesPrice * 1.015);
+        lower = Math.round(yesPrice * 0.985);
+        var tkInt = ((upper - lower) / 4);
+
+        if (maxValume == 0) {
+            maxValume = 4000;
+        }
+
+        if (upGap > gap || lowGap > gap) {
+            gap = lowGap;
+            if (upGap > lowGap) {
+                gap = upGap;
+            }
+
+            upper = Math.round(parseFloat(yesPrice) + parseFloat(gap));
+            lower = parseInt(yesPrice - gap);
+            tkInt = ((upper - lower) / 4);
+
+            if (chart != undefined) {
+                chart = undefined;
+            }
+        }
+
+        if (chart != undefined && maxValume > chart.yAxis[0].max) {
+            chart.yAxis[0].max = maxValume;
+            if (chart != undefined) {
+                chart = undefined;
+            }
+        }
+
+        if (chart == undefined) {
+            chart = new Highcharts.StockChart(
+                    {
+                        chart : {
+                            style : {
+                                fontFamily : 'Times New Roman'
+                            },
+                            marginRight : 20,
+                            animation : false,
+                            renderTo : 'readtimechart',
+                            alignTicks : true,
+                            margin : 0,
+                            marginTop : 10,
+                            marginLeft : 35,
+                            marginRight : 25,
+                            marginBottom : 24,
+                            plotBorderColor : '#606060',
+                            plotBorderWidth : 1
+                        },
+                        scrollbar : {
+                            enabled : false
+                        },
+                        credits : {
+                            text : ""
+                        },
+                        navigator : {
+                            enabled : false
+                        },
+                        tooltip : {
+                            enabled : false
+                        },
+                        rangeSelector : {
+                            enabled : false
+                        },
+                        plotOptions : {
+                            area : {
+                                fillColor : {
+                                    linearGradient : [ 0, 200, 400 ],
+                                    stops : [
+                                            [ 0, Highcharts.getOptions().colors[0] ],
+                                            [
+                                                    1,
+                                                    Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0)
+                                                            .get('rgba') ] ]
+                                },
+                                animation : false,
+                                color : "#4b32f9",
+                                fillOpacity : 0.6,
+                                lineWidth : 1,
+                                states : {
+                                    hover : {
+                                        enabled : false
+                                    }
+                                }
+                            },
+                            column : {
+                                animation : false,
+                                color : 'red',
+                                grouping : false
+                            },
+                            line : {
+                                animation : false,
+                                grouping : false,
+                                color : "#ff0000",
+                                lineWidth : 1,
+                                states : {
+                                    hover : {
+                                        enabled : false
+                                    }
+                                }
+                            }
+                        },
+                        xAxis : {
+                            type : 'datetime',
+                            tickInterval : 60 * 60 * 1000,
+                            minTickInterval : 60 * 60 * 1000,
+                            //showLastLabel: true,
+                            dateTimeLabelFormats : {
+                                hour : '%H'
+                            },
+                            min : startTime,
+                            max : closeTime,
+                            minorTickInterval : 60 * 60 * 1000,
+                            labels : {
+                                align : "right",
+                                style : {
+                                    fontFamily : 'Tahoma, Verdana, Arial, Helvetica, sans-serif',
+                                    fontSize : '11px',
+                                    color : "#000000"
+                                },
+                                x : 5
+                            }
+                        },
+                        yAxis : [
+                                {
+                                    lineWidth : 1,
+                                    min : 0,
+                                    offset : 0,
+                                    startOnTick : true,
+                                    //endOnTick: true,
+                                    labels : {
+                                        style : {
+                                            fontFamily : 'Tahoma, Verdana, Arial, Helvetica, sans-serif',
+                                            fontSize : '11px',
+                                            color : "#000000"
+                                        },
+                                        formatter : function() {
+                                            return parseInt(this.value / 100) + "";
+                                        },
+                                        x : 367,
+                                        y : 5,
+                                        align : 'left'
+                                    },
+                                    max : maxValume,
+                                    showLastLabel : true,
+                                    tickInterval : maxValume / 4,
+                                },
+                                {
+                                    title : {
+                                        rotation : 0,
+                                        align : 'high',
+                                        text : ""
+                                    },
+                                    plotLines : [ {
+                                        value : yesPrice,
+                                        color : 'blue',
+                                        dashStyle : 'shortdash',
+                                        width : 1,
+                                        zIndex : 3
+                                    } ],
+                                    lineWidth : 1,
+                                    minPadding : 0,
+                                    min : lower,
+                                    max : upper,
+                                    startOnTick : false,
+                                    //endOnTick: false,
+                                    tickInterval : tkInt,
+                                    labels : {
+                                        style : {
+                                            fontFamily : 'Tahoma, Verdana, Arial, Helvetica, sans-serif',
+                                            fontSize : '11px',
+                                            color : "#000000"
+                                        },
+                                        align : 'right',
+                                        x : -2,
+                                        y : 5,
+                                        formatter : function() {
+                                            //alert("value="+this.value);
+                                            return this.value;
+                                        }
+                                    },
+                                    showLastLabel : true,
+                                    tickPositions : [ lower, Math.round(lower + tkInt * 1), Math.round(yesPrice),
+                                            Math.round(lower + tkInt * 3), upper ]
+                                } ],
+                        series : [ {
+                            type : 'area',
+                            fillOpacity : 0.01,
+                            data : valumeArr,
+                            dataGrouping : {
+                                enabled : false
+                            }
+                        }, {
+                            type : 'line',
+                            name : "成交價",
+                            data : cPrice,
+                            yAxis : 1,
+                            dataGrouping : {
+                                enabled : false
+                            }
+                        } ]
+                    });
+            chart.redraw(true);
+        } else {
+            chart.series[0].setData(valumeArr, false);
+            chart.series[1].setData(cPrice, false);
+            chart.redraw();
+        }
+    }
+</script>
+<style type="text/css">
+<!--
+body {
+    font: 11px Tahoma, Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0px;
+}
+-->
+</style>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="position: relative; padding-top: 5px;">
+    <center>
+        <div id="readtimechart" style="display: inline; width: 230; height: 115;"></div>
+        <div style="position: relative;">
+
+            <label id="t" style="font-size: 12px"></label>
+            &nbsp;
+            &nbsp;
+            <font id="TWSE_TXT1">加權指數:</font> <label id="i"></label>
+            &nbsp;
+            &nbsp;
+            <label id="d"></label>
+            &nbsp;
+            &nbsp;
+            <label id="p"></label>
+            &nbsp;
+            &nbsp;
+            <font id="VALUE_TXT">成交金額:</font> <label id="tv"></label><BR> <label id="note"
+                style="position: relative; top: 5px;"></label>
+        </div>
+    </center>
+</body>
+</html>
