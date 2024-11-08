@@ -2,7 +2,6 @@ package com.proco.exec;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,7 +19,7 @@ public class ProcStockName {
 	public static java.util.concurrent.ConcurrentSkipListSet<String> uaMsgQueue = new java.util.concurrent.ConcurrentSkipListSet<String>();	
 	
 	public static java.util.concurrent.atomic.AtomicLong execCount = new java.util.concurrent.atomic.AtomicLong(0);
-	ConcurrentSkipListMap<Long,Map<String,String> > msgQueue0 = new ConcurrentSkipListMap<Long,Map<String,String> >();
+	ConcurrentSkipListMap<Long,String> msgQueue0 = new ConcurrentSkipListMap<Long,String>();
 	String baseKey = "";
 	String date = "";
 	Runnable runner = null;
@@ -36,13 +35,13 @@ public class ProcStockName {
 			threadPool = threadPool0;
 	}
 	
-	public static void proc(String baseKey, String date, Map<String,String> msg) {
+	public static void proc(String baseKey, String date, String msg) {
 		
 		long a = Utility.ckeckLong(baseKey);
 		if(a==-1) { //非数字要 3byte
 			byte[] check = baseKey.getBytes();
 			if(check.length<3) return;			
-		} else { //非数字要 2byte
+		} else { //数字要 2byte
 			byte[] check = baseKey.getBytes();
 			if(check.length<2) return;		
 		}
@@ -103,15 +102,9 @@ public class ProcStockName {
 		ConcurrentSkipListMap<String,String> infoHash2 = new ConcurrentSkipListMap<String, String>();
 		int c = 0;
 		while(!msgQueue0.isEmpty()) {
-			Map<String,String> js = msgQueue0.pollFirstEntry().getValue();
+			String js = msgQueue0.pollFirstEntry().getValue();
 			if(js!=null) {
-		        for (Map.Entry<? extends String, ? extends String> e : js.entrySet()) {
-		        	String k = e.getKey();
-		        	String v = e.getValue();
-		        	if(k!=null&&v!=null)
-		        		infoHash2.put(k, v);
-		        }
-				//infoHash2.putAll(js);
+				infoHash2.put(js, this.date);
 				c++;				
 			}
 			if(c == 150) {

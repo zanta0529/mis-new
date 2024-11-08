@@ -15,6 +15,7 @@ import org.aredis.cache.AsyncRedisFactory;
 import org.aredis.cache.JavaHandler;
 import org.aredis.cache.RedisCommand;
 import org.aredis.cache.RedisCommandInfo;
+import org.aredis.cache.RedisCommandList;
 
 import com.proco.util.Utility;
 
@@ -33,7 +34,7 @@ public class MultiAsyncRedisClient extends AbstractMultiAsyncRedisClient {
 		for(int i = 0; i < count; i++) {
 			AsyncRedisFactory f = new AsyncRedisFactory(null);
 	        JavaHandler jj = new JavaHandler();
-	        jj.setStringCompressionThreshold(1048576*5);
+	        jj.setStringCompressionThreshold(-1);
 	        f.setDataHandler(jj);
 	        if(auth!=null) {
 	        	f.setAuth(redis, auth);
@@ -42,7 +43,7 @@ public class MultiAsyncRedisClient extends AbstractMultiAsyncRedisClient {
 		}
 		AsyncRedisFactory f = new AsyncRedisFactory(null);
         JavaHandler jj = new JavaHandler();
-        jj.setStringCompressionThreshold(1048576*5);
+        jj.setStringCompressionThreshold(-1);
         f.setDataHandler(jj);
         if(auth!=null) {
         	f.setPoolSize(5);
@@ -59,7 +60,7 @@ public class MultiAsyncRedisClient extends AbstractMultiAsyncRedisClient {
 			try {
 				String cvals = (String)aredis.submitCommand(RedisCommand.PING).get().getResult();
 				if(cvals==null) {
-					System.out.println(Utility.getFullyDateTimeStr()+" "+c+" check redis client error. PING="+cvals);
+					if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" "+c+" check redis client error. PING="+cvals);
 					rt=false;
 				} else if(cvals.equals("PONG")){
 					//System.out.println(Utility.getFullyDateTimeStr()+" "+c+" check redis client ok. PING="+cvals);
@@ -71,7 +72,7 @@ public class MultiAsyncRedisClient extends AbstractMultiAsyncRedisClient {
 					//System.out.println(Utility.getFullyDateTimeStr()+" "+c+" check redis client ok. PING="+cvals);
 					rt = true;
 				} else {
-					System.out.println(Utility.getFullyDateTimeStr()+" "+c+" check redis client error. PING="+cvals);
+					if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" "+c+" check redis client error. PING="+cvals);
 					rt=false;
 				}
 			} catch (Exception e) {

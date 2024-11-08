@@ -98,7 +98,6 @@ public class ProcF19 {
 		
 		
 		List<RedisCommandInfo> ks = new ArrayList<RedisCommandInfo>();
-		java.util.TreeMap<String,String> snapshot = new java.util.TreeMap<String, String>();
 		while(!msgQueue0.isEmpty()) {
 			Map<String,String> js = msgQueue0.pollFirstEntry().getValue();
 			js.put("^", date);
@@ -126,9 +125,9 @@ public class ProcF19 {
 		    	inst = true;
 		    }
 		    
-		    System.out.println("--19--->"+uaMsgQueue.contains(baseKey)+" "+baseKey+" "+inst+" "+js.toString());
-			if(!snapshot.isEmpty()) {
-				StockDetail sp = new StockDetail(date,snapshot,false);
+		    System.out.println("--19--->"+baseKey+" "+inst+" "+js.toString());
+			if(!f01.infoHash2.isEmpty()) {
+				StockDetail sp = new StockDetail(date,f01.infoHash2,false);
 				sp.insertCF(ks);
 			}
 		}

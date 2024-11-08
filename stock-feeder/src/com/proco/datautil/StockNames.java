@@ -35,11 +35,11 @@ public class StockNames extends RedisModelBase {
 	
 	
 	public static void prepardStockNames(List<RedisCommandInfo> rinfos,String exchange,String symbol,String cname, String date){
-		String ename = "";
+		/*String ename = "";
 		String ch = symbol;
 		if(ch.endsWith(".tw")) ch = ch.substring(0,ch.length()-3);
 		
-		/*
+		
 		StockNameStore sns = new StockNameStore(date,ch);
 		List<Map.Entry<String, String>> sList = sns.get();
 		for(Map.Entry<String, String> hcol : sList){
@@ -49,14 +49,14 @@ public class StockNames extends RedisModelBase {
 			}
 		}*/
 		ProcStockEngName.proc(new String[] {exchange,symbol,cname,date},date);
-		prepardStockNames(rinfos,exchange, symbol, cname, ename,  date);
+		prepardStockNames(rinfos,exchange, symbol, cname, "",  date);
 	}	
 
 	public static void prepardStockNames(List<RedisCommandInfo> rinfos,String exchange,String symbol,String cname,String ename, String date){
 		StringBuffer sb = new StringBuffer(exchange).append('_').append(symbol);
 		
-		java.util.TreeMap<String, String> dataHash = new java.util.TreeMap<String,String>();
-		dataHash.put(sb.toString(),date);
+		//java.util.TreeMap<String, String> dataHash = new java.util.TreeMap<String,String>();
+		//dataHash.put(sb.toString(),date);
 		StringBuffer subKey0 = new StringBuffer();
 		for(char ch : symbol.toCharArray()){
 			if(ch=='.') break;
@@ -64,7 +64,7 @@ public class StockNames extends RedisModelBase {
 			//StockNames sn = new StockNames(subKey0.toString(),date,dataHash);
 			//System.out.println(subKey0.toString());
 			//sn.insertCF(rinfos);
-			ProcStockName.proc(subKey0.toString(),date,dataHash);
+			ProcStockName.proc(subKey0.toString().toUpperCase(),date,sb.toString());
 		}
 		boolean first = true;
 		while (cname.length() > 0) {
@@ -77,7 +77,7 @@ public class StockNames extends RedisModelBase {
 					//StockNames sn = new StockNames(subKey1.toString(),date, dataHash);
 					//System.out.println(subKey1.toString());
 					//sn.insertCF(rinfos);
-					ProcStockName.proc(subKey1.toString(),date,dataHash);
+					ProcStockName.proc(subKey1.toString().toUpperCase(),date,sb.toString());
 		        }
 			}
 			cname = cname.substring(1, cname.length());
@@ -97,7 +97,7 @@ public class StockNames extends RedisModelBase {
 						//StockNames sn = new StockNames(subKey1.toString(),date, dataHash);
 						//System.out.println(subKey1.toString());
 						//sn.insertCF(rinfos);
-						ProcStockName.proc(subKey1.toString(),date,dataHash);
+						ProcStockName.proc(subKey1.toString().toUpperCase(),date,sb.toString());
 					}
 		        }
 				en = en.substring(1, en.length());

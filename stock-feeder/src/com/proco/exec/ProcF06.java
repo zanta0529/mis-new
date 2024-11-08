@@ -184,10 +184,10 @@ public class ProcF06 {
 			nTime = sf.get("%");
 			
 			if(nLast!=null) {
-				if(securityID.equals("t00.tw") || securityID.equals("o00.tw")){
+				/*if(securityID.equals("t00.tw") || securityID.equals("o00.tw")){
 					String tt2 = sf.get("%");
 					this.setOHCLx00(tt2, nLast, pLast);
-				} else this.setOHCL(nLast, pLast);	
+				} else*/ this.setOHCL(nLast, pLast);	
 			}
 			infoHash2.putAll(sf);
 			

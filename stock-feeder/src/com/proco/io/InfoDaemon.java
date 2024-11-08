@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.aredis.cache.RedisCommandList;
+
 import com.proco.cache.RedisManager;
 import com.proco.codec.StockInboundHandler;
 import com.proco.exec.ProcF01;
@@ -33,8 +35,8 @@ import com.proco.util.Utility;
 public class InfoDaemon {
 
 	final public static String launcher_version = "0.7";
-	final public static String front_version = "1.06";
-	final public static String version = "20240717_TC6";
+	final public static String front_version = "1.07";
+	final public static String version = "20241102_TC1";
 	public static String confFile = "StockFeeder.conf";
 	public static java.util.concurrent.atomic.AtomicInteger clientCount = new java.util.concurrent.atomic.AtomicInteger(0);
 	static boolean run = false;
@@ -147,7 +149,7 @@ public class InfoDaemon {
 				Thread.sleep(10000);
 				String tradeDate = "t:"+DateManager.getExchangeDate("tse");
   	          	tradeDate += ",o:"+DateManager.getExchangeDate("otc");
-				System.out.println(Utility.getFullyDateTimeStr()+" "+tradeDate+" StockInHandler:"+ StockInboundHandler.decodeCount.get()+" RedisCmd:"+ RedisManager.getCommandCount() +" RedisQueue="+RedisManager.size()+" Snapshot:"+ProcStockSnapshot.execCount.getAndSet(0)+" StockCategory="+ProcStockCategory.execCount.get()+" StockNameInx="+ProcStockName.execCount.get()+" Datafeed:"+ProcF01.uaHash.size()+" Timeline:"+ProcL01.uaHash.size()+" TL0:"+ProcL20.exec0.get()+" TL1:"+ProcL20.exec1.get());
+				System.out.println(Utility.getFullyDateTimeStr()+" "+tradeDate+" StockInHandler:"+ StockInboundHandler.decodeCount.get()+" RedisCmd:"+ RedisManager.getCommandCount() +" RedisQueue="+RedisManager.size()+" Snapshot:"+ProcStockSnapshot.execCount.getAndSet(0)+" StockCategory="+ProcStockCategory.execCount.get()+" StockNameInx="+ProcStockName.execCount.get()+" Datafeed:"+ProcF01.uaHash.size()+" Timeline:"+ProcL01.uaHash.size()+" TL0:"+ProcL20.exec0.get()+" TL1:"+ProcL20.exec1.get()+" RStatus:"+RedisCommandList.lastStatus.toString());
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

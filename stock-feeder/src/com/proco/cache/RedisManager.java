@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 
 import org.aredis.cache.RedisCommand;
 import org.aredis.cache.RedisCommandInfo;
+import org.aredis.cache.RedisCommandList;
 
 import com.proco.util.Utility;
 
@@ -69,11 +70,13 @@ public class RedisManager {
 			aredis0 = new MultiAsyncRedisClient(redis,auth, b, executor);
 
 		}
-		
-		while(!aredis0.checkClients(true)) {
-			System.out.println(Utility.getFullyDateTimeStr()+" check redis client error, wait to connect.");
-			
+		boolean p = true;
+		while(!aredis0.checkClients(true)) {			
 			Utility.sleep(5000);
+			if(p) {
+				System.out.println(Utility.getFullyDateTimeStr()+" check redis client error, wait to connect.");
+				p = false;
+			}
 		}
 		
 		startCheckClients();
@@ -96,10 +99,10 @@ public class RedisManager {
 					long s = size();
 					if(s==0) {
 						boolean ok = checkClients();
-						System.out.println(Utility.getFullyDateTimeStr()+" queue="+s+" check redis client."+ok);	
+						if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" queue="+s+" check redis client."+ok);	
 						if(!ok) RedisManager.reinit();
 					} else {
-						System.out.println(Utility.getFullyDateTimeStr()+" queue="+s+" skip check redis client.");	
+						if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" queue="+s+" skip check redis client.");	
 					
 					}
 
@@ -128,10 +131,13 @@ public class RedisManager {
 			aredis0 = new MultiAsyncRedisClient(redis,auth, b, executor);
 
 		}
+		boolean p = true;
 		while(!aredis0.checkClients(true)) {
-			System.out.println(Utility.getFullyDateTimeStr()+" check redis client error, wait to connect.");
-			
 			Utility.sleep(5000);
+			if(p) {
+				System.out.println(Utility.getFullyDateTimeStr()+" check redis client error, wait to connect.");
+				p = false;
+			}
 		}
 		startCheckClients();
 	}
@@ -144,7 +150,7 @@ public class RedisManager {
 	public synchronized static void reinit() {
 		if((System.currentTimeMillis()-restart)<100000) return;
 		restart = System.currentTimeMillis();
-		System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Restart Redis Client.....");
+		if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Restart Redis Client.....");
 		
 		final ExecutorService executor0 = executor;
 		final AbstractMultiAsyncRedisClient aredis01 = aredis0; //
@@ -154,16 +160,16 @@ public class RedisManager {
 		
 		Thread th = new Thread() {
 			public void run() {
-				System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Start New Redis Client.....OK");
+				if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Start New Redis Client.....OK");
 				executor0.shutdown();
 				int waitcount = 0;
 				while(!executor0.isTerminated() || aredis01.size()>0) {
 					Utility.sleep(1000);
 					waitcount++; 
-					System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Old Redis Client.....Waitting to Terminated="+executor0.isTerminated()+" c="+waitcount+" exec_jobs="+aredis01.size());
+					if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Old Redis Client.....Waitting to Terminated="+executor0.isTerminated()+" c="+waitcount+" exec_jobs="+aredis01.size());
 				}
 				aredis01.close();
-				System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Old Redis Client.....Shutdown OK.");				
+				if(RedisCommandList.StatusChange.get()) System.out.println(Utility.getFullyDateTimeStr()+" RedisManager.reinit(): Old Redis Client.....Shutdown OK.");				
 			}
 		};
 		th.start();

@@ -31,10 +31,14 @@ import java.util.concurrent.RunnableFuture;
 import org.aredis.cache.RedisCommandInfo.CommandStatus;
 import org.aredis.cache.RedisCommandInfo.ResultType;
 import org.aredis.net.AsyncSocketTransport;
+import org.aredis.net.ConnectionStatus;
 import org.aredis.net.ServerInfo;
 import org.aredis.util.concurrent.EmptyRunnable;
 
-class RedisCommandList implements AsyncHandler<Integer> {
+public class RedisCommandList implements AsyncHandler<Integer> {
+	
+	public static ConnectionStatus lastStatus = ConnectionStatus.DOWN;
+	public static java.util.concurrent.atomic.AtomicBoolean StatusChange = new java.util.concurrent.atomic.AtomicBoolean(true);
 
     private class IndividualResponseHandler implements AsyncHandler<RedisCommandInfo> {
 
